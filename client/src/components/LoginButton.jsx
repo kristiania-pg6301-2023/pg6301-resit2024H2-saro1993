@@ -13,8 +13,8 @@ function LoginButton() {
       const query = new URLSearchParams({
         response_type: "token",
         scope: "openid profile email",
-        client_id: process.env.REACT_APP_CLIENT_ID,
-        redirect_uri: `${window.location.origin}/callback`,
+        client_id: process.env.CLIENT_ID,
+        redirect_uri: `${window.location.origin}/callback`, 
       });
       window.location.href = `${authorization_endpoint}?${query.toString()}`;
     } catch (error) {
