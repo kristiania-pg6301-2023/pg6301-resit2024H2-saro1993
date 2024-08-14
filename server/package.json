@@ -1,0 +1,20 @@
+{
+    "name": "news-server",
+    "version": "1.0.0",
+    "type": "module",
+    "scripts": {
+        "start": "nodemon server.js",
+        "dev": "nodemon server.js"
+    },
+    "dependencies": {
+        "concurrently": "^6.2.0",
+        "cookie-parser": "^1.4.6",
+        "dotenv": "^10.0.0",
+        "express": "^4.17.1",
+        "googleapis": "^140.0.1",
+        "jsonwebtoken": "^9.0.2",
+        "mongoose": "^6.0.0",
+        "openid-client": "^4.0.0",
+        "socket.io": "^4.0.0"
+    }
+}
