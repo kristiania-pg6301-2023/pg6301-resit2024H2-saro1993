@@ -5,6 +5,7 @@ import dotenv from 'dotenv';
 import { MongoClient, ObjectId } from 'mongodb';
 import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
+import cors from 'cors';
 
 dotenv.config();
 
@@ -14,6 +15,7 @@ const client = new OAuth2Client(process.env.CLIENT_ID, process.env.CLIENT_SECRET
 
 app.use(express.json());
 app.use(cookieParser());
+app.use(cors())
 
 MongoClient.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(async (connection) => {
