@@ -1,13 +1,17 @@
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../context/UserContext";
 
-export function LogoutButton() {
-  const history = useHistory();
+function LogoutButton() {
+  const navigate = useNavigate();
+  const { setUser } = useUserContext();
 
   const handleLogout = () => {
     sessionStorage.removeItem("access_token");
-    history.push("/"); 
+    setUser(null);
+    navigate("/");
   };
 
   return <button onClick={handleLogout}>Logg ut</button>;
 }
+export default LogoutButton;

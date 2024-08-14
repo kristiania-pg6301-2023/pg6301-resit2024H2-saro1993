@@ -17,6 +17,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(cors())
 
+// Connect to MongoDB
 MongoClient.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(async (connection) => {
     const db = connection.db("articles");
@@ -27,7 +28,7 @@ MongoClient.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnified
     // Upsert articles (insert if not exist, update if exist)
     const articles = [
       {
-        title: "Tech News: AI Advancements",
+        title: "Tech News 2024",
         content: "Latest advancements in AI are transforming industries.",
         image: "https://media.istockphoto.com/id/1409309637/vector/breaking-news-label-banner-isolated-vector-design.jpg?s=612x612&w=0&k=20&c=JoQHezk8t4hw8xXR1_DtTeWELoUzroAevPHo0Lth2Ow=",
         author: "sam"
@@ -45,25 +46,25 @@ MongoClient.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnified
         author: "emil"
       },
       {
-        title: "Health: Staying Fit",
+        title: "Health: Tips for Busy People",
         content: "Tips for staying healthy in a busy world.",
         image: "https://media.istockphoto.com/id/1409309637/vector/breaking-news-label-banner-isolated-vector-design.jpg?s=612x612&w=0&k=20&c=JoQHezk8t4hw8xXR1_DtTeWELoUzroAevPHo0Lth2Ow=",
         author: "sirwan"
       },
       {
-        title: "Space Exploration",
+        title: "NASA's Future Plans",
         content: "The future of human space exploration.",
         image: "https://media.istockphoto.com/id/1409309637/vector/breaking-news-label-banner-isolated-vector-design.jpg?s=612x612&w=0&k=20&c=JoQHezk8t4hw8xXR1_DtTeWELoUzroAevPHo0Lth2Ow=",
         author: "elham"
       },
       {
-        title: "Modern Art: An Analysis",
+        title: "Art Appreciation",
         content: "Understanding the meaning behind modern art.",
         image: "https://media.istockphoto.com/id/1409309637/vector/breaking-news-label-banner-isolated-vector-design.jpg?s=612x612&w=0&k=20&c=JoQHezk8t4hw8xXR1_DtTeWELoUzroAevPHo0Lth2Ow=",
         author: "soran"
       },
       {
-        title: "Technological Disruptions",
+        title: "Technological Innovation",
         content: "How technology is changing the world.",
         image: "https://media.istockphoto.com/id/1409309637/vector/breaking-news-label-banner-isolated-vector-design.jpg?s=612x612&w=0&k=20&c=JoQHezk8t4hw8xXR1_DtTeWELoUzroAevPHo0Lth2Ow=",
         author: "helene"
@@ -81,7 +82,7 @@ MongoClient.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnified
         author: "eff"
       },
       {
-        title: "AI and Ethics",
+        title: "AI",
         content: "The ethical implications of AI technology.",
         image: "https://media.istockphoto.com/id/1409309637/vector/breaking-news-label-banner-isolated-vector-design.jpg?s=612x612&w=0&k=20&c=JoQHezk8t4hw8xXR1_DtTeWELoUzroAevPHo0Lth2Ow=",
         author: "nic"
@@ -90,13 +91,11 @@ MongoClient.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnified
 
     for (let article of articles) {
       await articlesCollection.updateOne(
-        { title: article.title },  // Oppdater hvis tittel allerede finnes
-        { $set: article },         // Sett nye verdier
-        { upsert: true }           // Sett inn hvis den ikke finnes
+        { title: article.title }, 
+        { $set: article },        
+        { upsert: true }  
       );
     }
-
-    console.log("Articles upserted successfully.");
 
     // Google OAuth authentication routes
     app.get('/auth/google', (req, res) => {
@@ -150,7 +149,42 @@ MongoClient.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnified
       }
       res.send(req.userinfo);
     });
-
+    // auth/logout
+    app.get('/auth/logout', (req, res) => {
+      res.clearCookie('token');
+      res.redirect('/');
+    });
+    //reset cookie token for logout
+    app.get('/auth/logout', (req, res) => {
+      res.clearCookie('token');
+      res.redirect('/');
+    });
+    // update article
+    app.put('/api/articles/:id', async (req, res) => {
+      const { id } = req.params;
+      const { title, content, image, lastModifiedBy, lastModifiedEmail } = req.body;
+    
+      const result = await articlesCollection.updateOne(
+        { _id: new ObjectId(id) },
+        {
+          $set: {
+            title,
+            content,
+            image,
+            lastModifiedBy,
+            lastModifiedEmail,
+            modifiedAt: new Date(),
+          },
+        }
+      );
+    
+      if (result.matchedCount === 1) {
+        res.status(200).json({ message: "Article updated successfully" });
+      } else {
+        res.status(404).json({ message: "Article not found" });
+      }
+    });
+    
     // Fetch all articles from MongoDB
     app.get('/api/articles', async (req, res) => {
       const articles = await articlesCollection.find({}).toArray();
@@ -169,6 +203,17 @@ MongoClient.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnified
         res.status(500).json({ message: "Error fetching article" });
       }
     });
+    
+    //delete alle user tokens
+    app.delete("/auth/logout", (req, res) => {
+      res.clearCookie("token");
+      res.redirect("/");
+    });
+
+    app.get('/auth/logout', (req, res) => {
+      res.clearCookie('token');  
+      res.redirect('/');  
+    }); 
 
     // Update an article by ID
     app.put('/api/articles/:id', async (req, res) => {
@@ -202,6 +247,34 @@ MongoClient.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnified
         res.status(500).json({ message: "Error deleting article" });
       }
     });
+    // /auth/google/callback
+    app.get('/auth/google/callback', async (req, res) => {
+      try {
+        const { code } = req.query;
+        const redirectUri = `${process.env.BASE_URL}/auth/google/callback`;
+    
+        const { tokens } = await client.getToken({ code, redirect_uri: redirectUri });
+        const ticket = await client.verifyIdToken({
+          idToken: tokens.id_token,
+          audience: process.env.CLIENT_ID,
+        });
+    
+        const payload = ticket.getPayload();
+        const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' });
+    
+        res.cookie('token', token, { httpOnly: true });
+        res.redirect('/profile');
+      } catch (error) {
+        console.error('Error during Google authentication:', error);
+        res.status(500).send('Authentication failed');
+      }
+
+    });
+    app.get("/auth/logout", (req, res) => {
+      res.clearCookie("token");
+      res.redirect("/");
+    }
+    );
 
     // Serve static files
     app.use(express.static(path.resolve('../client/dist')));
@@ -210,6 +283,15 @@ MongoClient.connect(process.env.MONGODB_URL, { useNewUrlParser: true, useUnified
     app.get('*', (req, res) => {
       res.sendFile(path.resolve('../client/dist/index.html'));
     });
+    // fetchJSON
+    async function fetchJSON(url, options = {}) {
+      const response = await fetch(url, options);
+      if (!response.ok) {
+        throw new Error(`Failed to fetch: ${response.status} ${response.statusText}`);
+      }
+      return await response.json();
+    }
+    
 
     app.listen(PORT, () => {
       console.log(`Server is running on http://localhost:${PORT}`);
