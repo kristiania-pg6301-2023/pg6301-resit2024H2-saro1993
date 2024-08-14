@@ -1,11 +1,9 @@
 .idea
+.env
+/server/.env
+/client/.env
 node_modules/
 dist/
 .parcel-cache/
-/server/.env
-/server/.env.local
-/server/.env.development
-/server/.env.test
-/client/.env
 coverage/
-.env
+
