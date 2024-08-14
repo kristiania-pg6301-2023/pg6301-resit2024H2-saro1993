@@ -32,5 +32,4 @@ const ArticlePage = () => {
     </div>
   );
 };
-
 export default ArticlePage;

@@ -54,3 +54,15 @@
   font-style: italic;
   color: #666;
 }
+
+.article-detail-actions {
+  margin-top: 20px;
+  text-align: center; 
+}
+
+.save-message {
+  margin-top: 15px;
+  color: green;
+  font-weight: bold;
+  text-align: center;
+}

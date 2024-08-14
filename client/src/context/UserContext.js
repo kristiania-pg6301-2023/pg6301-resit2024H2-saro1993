@@ -3,7 +3,7 @@ import React, { createContext, useState, useEffect } from "react";
 export const UserContext = createContext();
 
 export function UserProvider({ children }) {
-  const [user, setUser] = useState(null); // Initialiser bruker som null
+  const [user, setUser] = useState(null); 
 
   useEffect(() => {
     const token = sessionStorage.getItem("access_token");

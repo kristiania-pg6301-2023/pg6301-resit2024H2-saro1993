@@ -10,5 +10,4 @@ function BackToHomeButton() {
 
   return <button onClick={handleBack}>Back to Home</button>;
 }
-
 export default BackToHomeButton;

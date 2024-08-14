@@ -13,7 +13,6 @@ function LoginCallback() {
 
       if (token) {
         try {
-          // Lagre token i localStorage
           localStorage.setItem("access_token", token);
 
           const response = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
@@ -25,7 +24,7 @@ function LoginCallback() {
           if (response.ok) {
             const user = await response.json();
             setUser(user);
-            navigate("/home");  // Naviger til hjemmesiden
+            navigate("/home");
           } else {
             console.error("Failed to fetch user data");
           }
@@ -41,5 +40,4 @@ function LoginCallback() {
 
   return <div>Logging in...</div>;
 }
-
 export default LoginCallback;

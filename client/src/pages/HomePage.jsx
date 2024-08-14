@@ -3,28 +3,14 @@ import { fetchJSON } from "../api/fetchJSON";
 import "./HomePage.css";
 import LoginButton from "../components/LoginButton";
 import { UserContext } from "../context/UserContext";
+import ArticleForm from "./ArticleForm";
 
 const HomePage = () => {
-  const { user, setUser } = useContext(UserContext);
+  const { user } = useContext(UserContext); 
   const [articles, setArticles] = useState([]);
   const [error, setError] = useState();
 
   useEffect(() => {
-    // Hent brukerinformasjon når HomePage lastes inn
-    const token = sessionStorage.getItem("access_token");
-    if (token && !user) {
-      fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-        .then((response) => response.json())
-        .then((data) => setUser(data))
-        .catch(() => {
-          setUser(null);
-        });
-    }
-
     async function getArticles() {
       try {
         const articles = await fetchJSON("/api/articles");
@@ -34,7 +20,19 @@ const HomePage = () => {
       }
     }
     getArticles();
-  }, [user, setUser]);
+  }, []);
+
+  const handleArticleSubmitted = () => {
+    async function refreshArticles() {
+      try {
+        const articles = await fetchJSON("/api/articles");
+        setArticles(articles);
+      } catch (error) {
+        setError(error.message);
+      }
+    }
+    refreshArticles();
+  };
 
   return (
     <div className="homepage-container">
@@ -46,12 +44,12 @@ const HomePage = () => {
           <button onClick={() => (window.location.href = "/auth/logout")}>
             Log out
           </button>
-          
         </div>
       )}
 
       <h1 className="homepage-title">News Articles</h1>
       {error && <div className="error-message">Error: {error}</div>}
+      <ArticleForm onArticleSubmitted={handleArticleSubmitted} />
       <ul className="article-list">
         {articles.map((article) => (
           <li key={article._id} className="article-item">

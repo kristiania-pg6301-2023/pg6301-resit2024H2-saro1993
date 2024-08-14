@@ -8,5 +8,4 @@ function ProfilePage(user) {
   
   </>
 }
-
 export default ProfilePage;
