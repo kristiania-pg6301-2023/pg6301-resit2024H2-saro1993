@@ -1,0 +1,43 @@
+name: Node.js CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    env:
+      MONGODB_URL: ${{ secrets.MONGODB_URL }}  # Sett miljøvariabelen her
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # Installer avhengigheter for rotmappen
+    - name: Install root dependencies
+      run: npm install
+
+    # Installer avhengigheter for client
+    - name: Install client dependencies
+      run: npm install
+      working-directory: ./client
+
+    # Installer avhengigheter for server
+    - name: Install server dependencies
+      run: npm install
+      working-directory: ./server
+
+    # Bygg client
+    - name: Build client
+      run: npm run build
+      working-directory: ./client
+
+    # Start server
+    - name: Start server
+      run: npm start
+      working-directory: ./server
