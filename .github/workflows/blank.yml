@@ -1,46 +1,40 @@
-name: CI/CD Pipeline
+name: Node.js CI
 
 on:
   push:
-    branches:
-      - master
+    branches: [main]
   pull_request:
-    branches:
-      - master
+    branches: [main]
 
 jobs:
   build:
+
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
+    # Installer avhengigheter for rotmappen
+    - name: Install root dependencies
+      run: npm install
 
-      - name: Install dependencies
-        run: npm install
+    # Installer avhengigheter for client
+    - name: Install client dependencies
+      run: npm install
+      working-directory: ./client
 
-      - name: Run tests
-        run: npm test
+    # Installer avhengigheter for server
+    - name: Install server dependencies
+      run: npm install
+      working-directory: ./server
 
-      - name: Build project
-        run: npm run build
+    # Bygg client
+    - name: Build client
+      run: npm run build
+      working-directory: ./client
 
-      - name: Deploy to Heroku
-        if: github.ref == 'refs/heads/main'
-        run: |
-          echo "Deploying to Heroku..."
-          npm install -g heroku
-          heroku auth:token | heroku auth:whoami
-          git push heroku main
-
-      - name: Deploy to GitHub Pages
-        if: github.ref == 'refs/heads/main'
-        run: |
-          echo "Deploying to GitHub Pages..."
-          npm install -g gh-pages
-          npm run deploy
+    # Start server
+    - name: Start server
+      run: npm start
+      working-directory: ./server
