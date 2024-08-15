@@ -11,6 +11,9 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      MONGODB_URL: ${{ secrets.MONGODB_URL }}  # Sett miljøvariabelen her
+
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
